@@ -38,8 +38,10 @@ def run_micro_macro(user_params):
     small_open = False
     user_params = {'frisch': 0.41, 'start_year': 2018,
                    'tau_b': [(0.21 * 0.55) * (0.017 / 0.055), (0.21 * 0.55) * (0.017 / 0.055)],
-                   'debt_ratio_ss': 1.0, 'alpha_T': alpha_T.tolist(),
+                   'debt_ratio_ss': 2.0, 'alpha_T': alpha_T.tolist(),
                    'alpha_G': alpha_G.tolist(), 'small_open': small_open}
+
+                   # debt_ratio_ss: changed to 2
 
     '''
     ------------------------------------------------------------------------

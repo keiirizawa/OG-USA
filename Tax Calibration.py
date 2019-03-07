@@ -140,6 +140,7 @@ results_GMM = opt.minimize(criterion, params_init, args = (gmm_args), method = '
 
 print(results_GMM)
 phi0_GMM, phi1_GMM, phi2_GMM = results_GMM.x
+print(phi0_GMM, phi1_GMM, phi2_GMM)
 
 
 #%%

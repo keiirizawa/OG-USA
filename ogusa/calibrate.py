@@ -48,6 +48,10 @@ def chi_n_func(s, a0, a1, a2, a3, a4):
     chi_n = a0 + a1 * s + a2 * s ** 2 + a3 * s ** 3 + a4 * s ** 4
     return chi_n
 
+def chebyshev_func(x, a0, a1, a2, a3, a4):
+    func = np.polynomial.chebyshev.chebval(x, [a0, a1, a2, a3, a4])
+    return func
+
 
 def chi_estimate(p, client=None):
     '''
@@ -95,11 +99,17 @@ def chi_estimate(p, client=None):
     baseline_dir="./OUTPUT"
     #chi_b_guess = np.ones(80)
 
-    a0 = 5.38312524e+01
-    a1 = -1.55746248e+00
-    a2 = 1.77689237e-02
-    a3 = -8.04751667e-06
-    a4 = 5.65432019e-08
+    # a0 = 5.38312524e+01
+    # a1 = -1.55746248e+00
+    # a2 = 1.77689237e-02
+    # a3 = -8.04751667e-06
+    # a4 = 5.65432019e-08
+
+    a0 = 170
+    a1 = -2.19154735e+00
+    a2 = -2.22817460e-02
+    a3 = 4.49993507e-04
+    a4 = -1.34197054e-06
 
     params_init = np.array([a0, a1, a2, a3, a4])
 
@@ -158,15 +168,21 @@ def minstat(params, *args):
     a0, a1, a2, a3, a4 = params
     p, client, data_moments, W = args
     ages = np.linspace(20, 100, p.S)
-    chi_n = chi_n_func(ages, a0, a1, a2, a3, a4)
+    chi_n = chebyshev_func(ages, a0, a1, a2, a3, a4)
+    print("-----------------------------------------------------")
+    print('PARAMS', params)
+    print("-----------------------------------------------------")
 
     p.chi_n = chi_n
-    print(chi_n)
-    print("-----------------------------------------------------")
-    ss_output = SS.run_SS(p, client)
+    #print(chi_n)
+
+    try:
+        ss_output = SS.run_SS(p, client)
+    except:
+        return 10e100
 
     model_moments = calc_moments(ss_output, p.omega_SS, p.lambdas, p.S, p.J)
-    print(model_moments)
+    print('Model moments:', model_moments)
     print("-----------------------------------------------------")
 
     # distance with levels
