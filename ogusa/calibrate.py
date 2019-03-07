@@ -104,14 +104,23 @@ def chi_estimate(p, client=None):
     # a2 = 1.77689237e-02
     # a3 = -8.04751667e-06
     # a4 = 5.65432019e-08
-
+    """
     a0 = 170
     a1 = -2.19154735e+00
     a2 = -2.22817460e-02
     a3 = 4.49993507e-04
     a4 = -1.34197054e-06
+    """
+    
+    a0 = 300#2.59572155e+02
+    a1 = -2.35122641e+01
+    a2 = 4.27581467e-01
+    a3 = -3.40808933e-03
+    a4 = 1.00404321e-05
 
-    params_init = np.array([a0, a1, a2, a3, a4])
+    sixty_plus_chi = 5000
+    params_init = np.array([sixty_plus_chi])
+    #params_init = np.array([a0, a1, a2, a3, a4, sixty_plus_chi])
 
     # Generate labor data moments
     labor_hours = np.array([167, 165, 165, 165, 165, 166, 165, 165, 164, 166, 164])
@@ -126,6 +135,9 @@ def chi_estimate(p, client=None):
     # endowment is 24 hours minus required time to sleep 6.5 hours)
     labor_moments = labor_hours_adj * 12 / (365 * 17.5)
 
+    #labor_moments[9] = 0.1
+    #labor_moments[10] = 0.1
+
     # combine moments
     data_moments = np.array(list(labor_moments.flatten()))
 
@@ -133,8 +145,15 @@ def chi_estimate(p, client=None):
     W = np.identity(p.J+2+p.S)
     W = np.identity(11)
 
-    est_output = opt.minimize(minstat, params_init, args=(p, client, data_moments, W), method="L-BFGS-B", tol=1e-15)
-
+    est_output = opt.minimize(minstat, params_init,\
+                args=(a0, a1, a2, a3, a4, p, client,\
+                data_moments, W), method="L-BFGS-B",\
+                tol=1e-15, options={'eps': 1e-15})
+    a0, a1, a2, a3, a4, sixty_plus_chi = est_output.x
+    chi_n = np.ones(p.S)
+    chi_n[:p.S // 2] = chebyshev_func(ages, a0, a1, a2, a3, a4)
+    chi_n[p.S // 2:] = sixty_plus_chi
+    p.chi_n = chi_n
 
     ss_output = SS.run_SS(p)
     return ss_output
@@ -165,13 +184,12 @@ def minstat(params, *args):
     --------------------------------------------------------------------
     '''
 
-    a0, a1, a2, a3, a4 = params
-    p, client, data_moments, W = args
-    ages = np.linspace(20, 100, p.S)
-    chi_n = chebyshev_func(ages, a0, a1, a2, a3, a4)
-    print("-----------------------------------------------------")
-    print('PARAMS', params)
-    print("-----------------------------------------------------")
+    sixty_plus_chi = params
+    a0, a1, a2, a3, a4, p, client, data_moments, W = args
+    ages = np.linspace(20, 60, p.S // 2)
+    chi_n = np.ones(p.S)
+    chi_n[:p.S // 2] = chebyshev_func(ages, a0, a1, a2, a3, a4)
+    chi_n[p.S // 2:] = sixty_plus_chi
 
     p.chi_n = chi_n
     #print(chi_n)
@@ -179,8 +197,11 @@ def minstat(params, *args):
     try:
         ss_output = SS.run_SS(p, client)
     except:
-        return 10e100
+        return 1e100
 
+    print("-----------------------------------------------------")
+    print('PARAMS', params)
+    print("-----------------------------------------------------")
     model_moments = calc_moments(ss_output, p.omega_SS, p.lambdas, p.S, p.J)
     print('Model moments:', model_moments)
     print("-----------------------------------------------------")
