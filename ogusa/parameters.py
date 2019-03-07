@@ -231,6 +231,8 @@ class Specifications(ParametersBase):
                 self.baseline, self.analytical_mtrs, self.tax_func_type,
                 self.age_specific, self.start_year, self.reform, self.guid,
                 tx_func_est_path, self.data, client, self.num_workers)
+
+        #####
         if self.baseline:
             baseline_pckl = "TxFuncEst_baseline{}.pkl".format(self.guid)
             estimate_file = tx_func_est_path
@@ -245,7 +247,7 @@ class Specifications(ParametersBase):
             dict_params = self.read_tax_func_estimate(estimate_file,
                                                       policy_pckl)
 
-        self.mean_income_data = dict_params['tfunc_avginc'][0]
+        self.mean_income_data = dict_params['tfunc_avginc'][0]    #### maybe hard code this in SS.py and put mean income in Japan. et
         try:
             self.taxcalc_version = dict_params['taxcalc_version']
         except KeyError:

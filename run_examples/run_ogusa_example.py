@@ -48,19 +48,28 @@ def run_micro_macro(user_params):
     '''
     output_base = BASELINE_DIR
     kwargs = {'output_base': output_base, 'baseline_dir': BASELINE_DIR,
-              'test': False, 'time_path': True, 'baseline': True,
+              'test': False, 'time_path': False, 'baseline': True,
               'user_params': user_params, 'guid': '_example',
-              'run_micro': True, 'data': 'cps', 'client': client,
+              'run_micro': False, 'data': 'cps', 'client': client,
               'num_workers': num_workers}
 
+    # run_micro: false because already have taxfunc
+    # Set 'time_path': False to stop from running transition path
+    # updated and included 'tax_func_type'
+    # set run_micro: False to stop it from running taxfunc
+    # 'tax_func_type': 'GS',
+    
     start_time = time.time()
     runner(**kwargs)
     print('run time = ', time.time()-start_time)
 
     '''
+    '''
+    '''
     ------------------------------------------------------------------------
     Run reform policy
     ------------------------------------------------------------------------
+    '''
     '''
     user_params = {'frisch': 0.41, 'start_year': 2018,
                    'tau_b': [(0.35 * 0.55) * (0.017 / 0.055)],
@@ -84,6 +93,8 @@ def run_micro_macro(user_params):
 
     print("total time was ", (time.time() - start_time))
     print('Percentage changes in aggregates:', ans)
+    '''
+
 
 
 if __name__ == "__main__":

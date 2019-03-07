@@ -5,7 +5,7 @@ This module defines the runner() function, which is used to run OG-USA
 import pickle
 import os
 import time
-from ogusa import SS, TPI, utils
+from ogusa import SS, TPI, utils, calibrate
 from ogusa.parameters import Specifications
 
 
@@ -39,13 +39,15 @@ def runner(output_base, baseline_dir, test=False, time_path=True,
     spec.update_specifications(user_params)
     print('path for tax functions: ', spec.output_base)
     spec.get_tax_function_parameters(client, run_micro)
+    #### Currently running machine !!!!!
 
     '''
     ------------------------------------------------------------------------
         Run SS
     ------------------------------------------------------------------------
     '''
-    ss_outputs = SS.run_SS(spec, client=client)
+    ss_outputs = calibrate.chi_estimate(spec, client=client)
+    #SS.run_SS(spec, client=client)
 
     '''
     ------------------------------------------------------------------------
