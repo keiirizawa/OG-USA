@@ -242,7 +242,7 @@ def inner_loop(outer_loop_vars, p, client):
                             p.omega_SS.reshape(p.S, 1) *
                             p.lambdas.reshape(1, p.J)).sum()
     if p.baseline:
-        new_factor = p.mean_income_data / average_income_model
+        new_factor = p.mean_income_data / average_income_model   ###### mean income data, !!!!!!!!! parameters.py
     else:
         new_factor = factor
     new_BQ = aggr.get_BQ(new_r, bssmat, None, p, 'SS', False)
@@ -698,11 +698,11 @@ def run_SS(p, client=None):
     # For initial guesses of w, r, T_H, and factor, we use values that
     # are close to some steady state values.
     if p.baseline:
-        b_guess = np.ones((p.S, p.J)) * 0.07
-        n_guess = np.ones((p.S, p.J)) * .4 * p.ltilde
+        b_guess = np.ones((p.S, p.J)) * 0.07   ### hard coded
+        n_guess = np.ones((p.S, p.J)) * .4 * p.ltilde  ### hard coded
         rguess = 0.09
         T_Hguess = 0.12
-        factorguess = 70000
+        factorguess = 70000 # convert it to yen
         BQguess = aggr.get_BQ(rguess, b_guess, None, p, 'SS', False)
         ss_params_baseline = (b_guess, n_guess, None, None, p, client)
         if p.use_zeta:
@@ -777,4 +777,5 @@ def run_SS(p, client=None):
                           + 'ratio results in an infeasible amount of '
                           + 'government spending in order to close the '
                           + 'budget (i.e., G < 0)')
+
     return output

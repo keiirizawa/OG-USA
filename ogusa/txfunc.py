@@ -315,8 +315,9 @@ def get_tax_rates(params, X, Y, wgts, tax_func_type, rate_type,
     if tax_func_type == 'GS':
         phi0, phi1, phi2 = params[:3]
         if rate_type == 'etr':
-            txrates = (
-                (phi0 * (I - ((I ** -phi1) + phi2) ** (-1 / phi1))) / I)
+            txrates = phi0 - phi0 * (phi1 * I ** phi2 + 1)**(-1 / phi2)
+            #txrates = (
+            #    (phi0 * (I - ((I ** -phi1) + phi2) ** (-1 / phi1))) / I)
         else:  # marginal tax rate function
             txrates = (phi0*(1 - (I ** (-phi1 - 1) * ((I ** -phi1) + phi2)
                                   ** ((-1 - phi1) / phi1))))
@@ -681,7 +682,9 @@ def replace_outliers(param_arr, sse_big_mat):
 
 
 def txfunc_est(df, s, t, rate_type, tax_func_type, numparams,
-               output_dir, graph):
+               output_dir, graph):  #### tax_func_type = GS
+
+    # df:
     '''
     --------------------------------------------------------------------
     This function uses tax tax rate and income data for individuals of a
@@ -879,26 +882,29 @@ def txfunc_est(df, s, t, rate_type, tax_func_type, numparams,
         params_to_plot = np.append(params[:4],
                                    np.array([max_x, max_y, share, min_x,
                                              min_y, shift]))
-    elif tax_func_type == "GS":
+    elif tax_func_type == "GS":  # Runs with Gauss Strauss tax !!!!!!!!!!!!!!!!!
         '''
         Estimate Gouveia-Strauss parameters via least squares.
         Need to use a different functional form than for DEP function.
         '''
-        phi0_init = 1.0
-        phi1_init = 1.0
-        phi2_init = 1.0
-        params_init = np.array([phi0_init, phi1_init, phi2_init])
-        tx_objs = (np.array([None]), X, Y, txrates, wgts, tax_func_type,
-                   rate_type)
-        bnds = ((1e-12, None), (1e-12, None), (1e-12, None))
-        params_til = opt.minimize(wsumsq, params_init, args=(tx_objs),
-                                  method="L-BFGS-B", bounds=bnds, tol=1e-15)
-        phi0til, phi1til, phi2til = params_til.x
-        wsse = params_til.fun
-        obs = df.shape[0]
-        params = np.zeros(numparams)
-        params[:3] = np.array([phi0til, phi1til, phi2til])
+        # phi0_init = 1.0
+        # phi1_init = 1.0
+        # phi2_init = 1.0
+        # params_init = np.array([phi0_init, phi1_init, phi2_init])
+        # tx_objs = (np.array([None]), X, Y, txrates, wgts, tax_func_type,
+        #            rate_type)
+        # bnds = ((1e-12, None), (1e-12, None), (1e-12, None))
+        # params_til = opt.minimize(wsumsq, params_init, args=(tx_objs),
+        #                           method="L-BFGS-B", bounds=bnds, tol=1e-15)
+        # phi0til, phi1til, phi2til = params_til.x
+        # wsse = params_til.fun
+        # obs = df.shape[0]
+        # params = np.zeros(numparams)
+        ### Plug in our estimates of phi0, phi1, phi2 based on the function. !!!!!
+        # params[:3] = np.array([phi0til, phi1til, phi2til])
+        params[:3] = np.array([0.37247346, 0.01977261, 1.71646644])
         params_to_plot = params
+
     elif tax_func_type == "linear":
         '''
         For linear rates, just take the mean ETR or MTR by age-year.
@@ -1390,9 +1396,10 @@ def tax_func_loop(t, micro_data, beg_yr, s_min, s_max, age_specific,
 
 def tax_func_estimate(BW, S, starting_age, ending_age,
                       beg_yr=DEFAULT_START_YEAR, baseline=True,
-                      analytical_mtrs=False, tax_func_type='DEP',
+                      analytical_mtrs=False, tax_func_type='GS',
                       age_specific=False, reform={}, data=None,
                       client=None, num_workers=1):
+    #### CHANGED THIS TO USE 'GS' Tax Calculation
     '''
     --------------------------------------------------------------------
     This function performs analysis on the source data from Tax-
@@ -1722,7 +1729,7 @@ def tax_func_estimate(BW, S, starting_age, ending_age,
 
 def get_tax_func_estimate(BW, S, starting_age, ending_age,
                           baseline=False, analytical_mtrs=False,
-                          tax_func_type='DEP', age_specific=False,
+                          tax_func_type='GS', age_specific=False,
                           start_year=DEFAULT_START_YEAR, reform={},
                           guid='', tx_func_est_path=None, data=None,
                           client=None, num_workers=1):
