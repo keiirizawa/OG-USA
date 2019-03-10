@@ -197,17 +197,25 @@ class Specifications(ParametersBase):
         # Interpolate chi_n and create omega_SS_80 if necessary
         if self.S == 80:
             self.omega_SS_80 = self.omega_SS
-            self.chi_n = self.chi_n_80
+            try:
+                print('USING PICKLED CHI_N')
+                self.chi_n = pickle.load(open("chi_n.p", "rb"))
+            except:
+                self.chi_n = self.chi_n_80
         elif self.S < 80:
-            self.age_midp_80 = np.linspace(20.5, 99.5, 80)
-            self.chi_n_interp = si.interp1d(self.age_midp_80,
-                                            np.squeeze(self.chi_n_80),
-                                            kind='cubic')
-            self.newstep = 80.0 / self.S
-            self.age_midp_S = np.linspace(20 + 0.5 * self.newstep,
-                                          100 - 0.5 * self.newstep,
-                                          self.S)
-            self.chi_n = self.chi_n_interp(self.age_midp_S)
+            try:
+                print('USING PICKLED CHI_N')
+                self.chi_n = pickle.load(open("chi_n.p", "rb"))
+            except:   
+                self.age_midp_80 = np.linspace(20.5, 99.5, 80)
+                self.chi_n_interp = si.interp1d(self.age_midp_80,
+                                                np.squeeze(self.chi_n_80),
+                                                kind='cubic')
+                self.newstep = 80.0 / self.S
+                self.age_midp_S = np.linspace(20 + 0.5 * self.newstep,
+                                            100 - 0.5 * self.newstep,
+                                            self.S)
+                self.chi_n = self.chi_n_interp(self.age_midp_S)
             (_, _, self.omega_SS_80, _, _, _, _, _) = \
                 demographics.get_pop_objs(20, 80, 320, 1, 100,
                                           self.start_year, False)

@@ -14,6 +14,7 @@ def chi_n_func(s, a0, a1, a4, a6):#, a3, a4, a5):
             + a3 * s ** 3 + a4 * s ** 4\
     return chi_n
 
+
 def crit(params, *args):
     a0, a1, a2, a3 = params
     data_moments, ages = args

@@ -312,7 +312,7 @@ def get_tax_rates(params, X, Y, wgts, tax_func_type, rate_type,
     X2 = X ** 2
     Y2 = Y ** 2
     I = X + Y
-    if tax_func_type == 'GS':
+    if tax_func_type ==GS' ':
         #phi0, phi1, phi2 = params[:3]
         phi0 = 0.37247346
         phi1 = 0.01977261
