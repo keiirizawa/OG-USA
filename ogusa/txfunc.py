@@ -901,8 +901,8 @@ def txfunc_est(df, s, t, rate_type, tax_func_type, numparams,
         # params_til = opt.minimize(wsumsq, params_init, args=(tx_objs),
         #                           method="L-BFGS-B", bounds=bnds, tol=1e-15)
         # phi0til, phi1til, phi2til = params_til.x
-        # wsse = params_til.fun
-        # obs = df.shape[0]
+        wsse = params_til.fun
+        obs = df.shape[0]
         params = np.zeros(numparams)
         ### Plug in our estimates of phi0, phi1, phi2 based on the function. !!!!!
         # params[:3] = np.array([phi0til, phi1til, phi2til])
