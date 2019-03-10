@@ -903,7 +903,7 @@ def txfunc_est(df, s, t, rate_type, tax_func_type, numparams,
         # phi0til, phi1til, phi2til = params_til.x
         # wsse = params_til.fun
         # obs = df.shape[0]
-        # params = np.zeros(numparams)
+        params = np.zeros(numparams)
         ### Plug in our estimates of phi0, phi1, phi2 based on the function. !!!!!
         # params[:3] = np.array([phi0til, phi1til, phi2til])
         params[:3] = np.array([0.37247346, 0.01977261, 1.71646644])
