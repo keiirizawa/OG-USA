@@ -104,28 +104,23 @@ def chi_estimate(p, client=None):
     # a2 = 1.77689237e-02
     # a3 = -8.04751667e-06
     # a4 = 5.65432019e-08
-    """ Kei's Vals
+    """
     a0 = 170
     a1 = -2.19154735e+00
     a2 = -2.22817460e-02
     a3 = 4.49993507e-04
     a4 = -1.34197054e-06
     """
-    """ Adam's Vals 1
-    a0 = 2.59572155e+02
+    
+    a0 = 300#2.59572155e+02
     a1 = -2.35122641e+01
     a2 = 4.27581467e-01
     a3 = -3.40808933e-03
     a4 = 1.00404321e-05
-    """
-    a0 = 1.16807470e+03#5.19144310e+02
-    a1 = -1.05805189e+02#-4.70245283e+01
-    a2 = 1.92411660e+00#8.55162933e-01
-    a3 = -1.53364020e-02#-6.81617866e-03
-    a4 = 4.51819445e-05#2.00808642e-05
 
-    sixty_plus_chi = 10000
-    params_init = np.array([a0, a1, a2, a3, a4])
+    sixty_plus_chi = 5000
+    params_init = np.array([sixty_plus_chi])
+    #params_init = np.array([a0, a1, a2, a3, a4, sixty_plus_chi])
 
     # Generate labor data moments
     labor_hours = np.array([167, 165, 165, 165, 165, 166, 165, 165, 164, 166, 164])
@@ -150,21 +145,19 @@ def chi_estimate(p, client=None):
     W = np.identity(p.J+2+p.S)
     W = np.identity(11)
 
-    ages = np.linspace(20, 60, p.S // 2)
-
     est_output = opt.minimize(minstat, params_init,\
-                args=(p, client, data_moments, W, ages, sixty_plus_chi),\
-                method="L-BFGS-B",\
-                tol=1e-15, options={'eps': 1e-10})
-    a0, a1, a2, a3, a4 = est_output.x
+                args=(a0, a1, a2, a3, a4, p, client,\
+                data_moments, W), method="L-BFGS-B",\
+                tol=1e-15, options={'eps': 1e-15})
+    a0, a1, a2, a3, a4, sixty_plus_chi = est_output.x
     chi_n = np.ones(p.S)
     chi_n[:p.S // 2] = chebyshev_func(ages, a0, a1, a2, a3, a4)
     chi_n[p.S // 2:] = sixty_plus_chi
     p.chi_n = chi_n
-    pickle.dump(chi_n, open("chi_n.p", "wb"))
 
     ss_output = SS.run_SS(p)
     return ss_output
+
 
 
 def minstat(params, *args):
@@ -191,8 +184,9 @@ def minstat(params, *args):
     --------------------------------------------------------------------
     '''
 
-    a0, a1, a2, a3, a4 = params
-    p, client, data_moments, W, ages, sixty_plus_chi = args
+    sixty_plus_chi = params
+    a0, a1, a2, a3, a4, p, client, data_moments, W = args
+    ages = np.linspace(20, 60, p.S // 2)
     chi_n = np.ones(p.S)
     chi_n[:p.S // 2] = chebyshev_func(ages, a0, a1, a2, a3, a4)
     chi_n[p.S // 2:] = sixty_plus_chi
