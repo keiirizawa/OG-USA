@@ -11,7 +11,7 @@ from ogusa.parameters import Specifications
 
 def runner(output_base, baseline_dir, test=False, time_path=True,
            baseline=True, reform={}, user_params={}, guid='',
-           run_micro=True, data=None, client=None, num_workers=1):
+           run_micro=False, data=None, client=None, num_workers=1):
 
     tick = time.time()
     # Create output directory structure
@@ -46,8 +46,8 @@ def runner(output_base, baseline_dir, test=False, time_path=True,
         Run SS
     ------------------------------------------------------------------------
     '''
-    #ss_outputs = calibrate.chi_estimate(spec, client=client)
-    ss_outputs = SS.run_SS(spec, client=client)
+    ss_outputs = calibrate.chi_estimate(spec, client=client)
+    #ss_outputs = SS.run_SS(spec, client=client)
 
     '''
     ------------------------------------------------------------------------

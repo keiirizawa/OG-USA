@@ -26,13 +26,13 @@ def run_micro_macro(user_params):
 
     # Set some model parameters
     # See parameters.py for description of these parameters
-    alpha_T = np.zeros(50)
+    alpha_T = np.ones(50)
     alpha_T *= 0.1234784428 #Japan transfers
     #alpha_T[0:2] = 0.09
     #alpha_T[2:10] = 0.09 + 0.01
     #alpha_T[10:40] = 0.09 - 0.01
     #alpha_T[40:] = 0.09
-    alpha_G = np.zeros(7)
+    alpha_G = np.ones(7)
     alpha_G *= 0.01239313481 #Japan discretionary spending
     #alpha_G[0:3] = 0.05 - 0.01
     #alpha_G[3:6] = 0.05 - 0.005
@@ -54,7 +54,7 @@ def run_micro_macro(user_params):
     kwargs = {'output_base': output_base, 'baseline_dir': BASELINE_DIR,
               'test': False, 'time_path': False, 'baseline': True,
               'user_params': user_params, 'guid': '_example',
-              'run_micro': True, 'data': 'cps', 'client': client,
+              'run_micro': False, 'data': 'cps', 'client': client,
               'num_workers': num_workers}
 
     # run_micro: false because already have taxfunc

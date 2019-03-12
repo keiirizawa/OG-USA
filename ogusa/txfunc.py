@@ -1086,6 +1086,9 @@ def tax_func_loop(t, micro_data, beg_yr, s_min, s_max, age_specific,
     AvgInc[t-beg_yr] = \
         (((data['Adjusted total income'] * data['Weights']).sum())
          / data['Weights'].sum())
+    
+    # np.ones_like(79) scalar, check in the picke if scalar or by year 
+    # if array creste array and multiply by 5.72
 
     # Calculate average ETR and MTRs (weight by population weights
     #    and income) for each year
@@ -1712,10 +1715,12 @@ def tax_func_estimate(BW, S, starting_age, ending_age,
 
     # Save tax function parameters array and computation time in
     # dictionary
+    AvgInc_corrected = np.ones_like(AvgInc) * 5.372
+    # Average income corrected for Japan 
     dict_params = dict([('tfunc_etr_params_S', etrparam_arr_S),
                         ('tfunc_mtrx_params_S', mtrxparam_arr_S),
                         ('tfunc_mtry_params_S', mtryparam_arr_S),
-                        ('tfunc_avginc', AvgInc),
+                        ('tfunc_avginc', AvgInc_corrected),
                         ('tfunc_avg_etr', AvgETR),
                         ('tfunc_avg_mtrx', AvgMTRx),
                         ('tfunc_avg_mtry', AvgMTRy),
