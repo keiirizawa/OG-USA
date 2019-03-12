@@ -118,12 +118,20 @@ def chi_estimate(p, client=None):
     a3 = -3.40808933e-03
     a4 = 1.00404321e-05
     """
+
     a0 = 1.16807470e+03#5.19144310e+02
     a1 = -1.05805189e+02#-4.70245283e+01
     a2 = 1.92411660e+00#8.55162933e-01
     a3 = -1.53364020e-02#-6.81617866e-03
     a4 = 4.51819445e-05#2.00808642e-05
-
+    
+    '''
+    a0 = 1.14432355e+02
+    a1 = -6.86389313e+00
+    a2 = 8.76791155e-02
+    a3 = -4.79244252e-04
+    a4 = 1.01718461e-06
+    '''
     sixty_plus_chi = 10000
     params_init = np.array([a0, a1, a2, a3, a4])
 
@@ -203,6 +211,9 @@ def minstat(params, *args):
     try:
         ss_output = SS.run_SS(p, client)
     except:
+        print("-----------------------------------------------------")
+        print("Steady state not found")
+        print("-----------------------------------------------------")
         return 1e100
 
     print("-----------------------------------------------------")
@@ -260,12 +271,7 @@ def calc_moments(ss_output, omega_SS, lambdas, S, J):
     ### we have ages 20-100 so lets find binds based on population weights
     # converting to match our data moments
     model_labor_moments = pd.DataFrame(model_labor_moments * omega_SS)
-    #print("--------------------------------------------------------------------")
-    #print("Original:")
-    #model_labor_moments = model_labor_moments.mean(axis=0)
     model_labor_moments.rename({0: 'labor_weighted'}, axis=1, inplace=True)
-    #print(model_labor_moments)
-    #print("--------------------------------------------------------------------")
 
     ages = np.linspace(20, 100, S)
     age_bins = np.linspace(20, 75, 12)
@@ -273,13 +279,6 @@ def calc_moments(ss_output, omega_SS, lambdas, S, J):
     labels = np.linspace(20, 70, 11)
     model_labor_moments['pop_dist'] = omega_SS
     model_labor_moments['age_bins'] = pd.cut(ages, age_bins, right=False, include_lowest=True, labels=labels)
-    #print("--------------------------------------------------------------------")
-    #print("Updated")
-    #print(model_labor_moments)
-    #print("--------------------------------------------------------------------")
-    #print("Shape:")
-    #print(model_labor_moments.shape)
-    #print("--------------------------------------------------------------------")
     weighted_labor_moments = model_labor_moments.groupby('age_bins')['labor_weighted'].sum() /\
                                 model_labor_moments.groupby('age_bins')['pop_dist'].sum()
 
@@ -288,85 +287,3 @@ def calc_moments(ss_output, omega_SS, lambdas, S, J):
     model_moments = list(weighted_labor_moments)
 
     return model_moments
-
-
-def the_inequalizer(dist, pop_weights, ability_weights, factor, S, J):
-    '''
-    --------------------------------------------------------------------
-    Generates three measures of inequality.
-
-    Inputs:
-        dist            = [S,J] array, distribution of endogenous variables over age and lifetime income group
-        pop_weights     = [S,] vector, fraction of population by each age
-        ability_weights = [J,] vector, fraction of population for each lifetime income group
-        factor          = scalar, factor relating model units to dollars
-        S               = integer, number of economically active periods in lifetime
-        J               = integer, number of ability types
-
-    Functions called: None
-
-    Objects in function:
-        weights           = [S,J] array, fraction of population for each age and lifetime income group
-        flattened_dist    = [S*J,] vector, vectorized dist
-        flattened_weights = [S*J,] vector, vectorized weights
-        sort_dist         = [S*J,] vector, ascending order vector of dist
-        loc_90th          = integer, index of 90th percentile
-        loc_10th          = integer, index of 10th percentile
-        loc_99th          = integer, index of 99th percentile
-
-    Returns: measure of inequality
-    --------------------------------------------------------------------
-    '''
-
-    weights = np.tile(pop_weights.reshape(S, 1), (1, J)) * \
-    ability_weights.reshape(1, J)
-    flattened_dist = dist.flatten()
-    flattened_weights = weights.flatten()
-    idx = np.argsort(flattened_dist)
-    sort_dist = flattened_dist[idx]
-    sort_weights = flattened_weights[idx]
-    cum_weights = np.cumsum(sort_weights)
-
-    # gini
-    p = cum_weights/cum_weights.sum()
-    nu = np.cumsum(sort_dist*sort_weights)
-    nu = nu/nu[-1]
-    gini_coeff = (nu[1:]*p[:-1]).sum() - (nu[:-1] * p[1:]).sum()
-
-
-    # variance
-    ln_dist = np.log(sort_dist*factor) # not scale invariant
-    weight_mean = (ln_dist*sort_weights).sum()/sort_weights.sum()
-    var_ln_dist = ((sort_weights*((ln_dist-weight_mean)**2)).sum())*(1./(sort_weights.sum()))
-
-
-    # 90/10 ratio
-    loc_90th = np.argmin(np.abs(cum_weights - .9))
-    loc_10th = np.argmin(np.abs(cum_weights - .1))
-    ratio_90_10 = sort_dist[loc_90th] / sort_dist[loc_10th]
-
-    # top 10% share
-    top_10_share= (sort_dist[loc_90th:] * sort_weights[loc_90th:]
-           ).sum() / (sort_dist * sort_weights).sum()
-
-    # top 1% share
-    loc_99th = np.argmin(np.abs(cum_weights - .99))
-    top_1_share = (sort_dist[loc_99th:] * sort_weights[loc_99th:]
-           ).sum() / (sort_dist * sort_weights).sum()
-
-    # calculate percentile shares (percentiles based on lambdas input)
-    dist_weight = (sort_weights*sort_dist)
-    total_dist_weight = dist_weight.sum()
-    cumsum = np.cumsum(sort_weights)
-    dist_sum = np.zeros((J,))
-    cum_weights = ability_weights.cumsum()
-    for i in range(J):
-        cutoff = sort_weights.sum() / (1./cum_weights[i])
-        dist_sum[i] = ((dist_weight[cumsum < cutoff].sum())/total_dist_weight)
-
-
-    dist_share = np.zeros((J,))
-    dist_share[0] = dist_sum[0]
-    dist_share[1:] = dist_sum[1:]-dist_sum[0:-1]
-
-    return np.append([dist_share], [gini_coeff,var_ln_dist])

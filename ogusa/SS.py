@@ -337,6 +337,10 @@ def SS_solver(bmat, nmat, r, BQ, T_H, factor, Y, p, client,
     --------------------------------------------------------------------
     '''
     # Rename the inputs
+    Lss = aggr.get_L(nssmat, p, 'SS')
+    print(Lss)
+    stop
+
     if not p.budget_balance:
         if not p.baseline_spending:
             Y = T_H / p.alpha_T[-1]
@@ -614,9 +618,15 @@ def SS_fsolve(guesses, *args):
 
     # Solve for the steady state levels of b and n, given w, r, T_H and
     # factor
+    print('------------------------------------')
+    print("Made it to fsolve 0!")
+    print('------------------------------------')
     (euler_errors, bssmat, nssmat, new_r, new_w, new_T_H, new_Y,
      new_factor, new_BQ, average_income_model) =\
         inner_loop(outer_loop_vars, p, client)
+    print('------------------------------------')
+    print("Made it to fsolve 1!")
+    print('------------------------------------')
 
     # Create list of errors in general equilibrium variables
     error1 = new_r - r
@@ -646,6 +656,9 @@ def SS_fsolve(guesses, *args):
     if r + p.delta <= 0:
         errors[0] = 1e9
 
+    print('------------------------------------')
+    print("Made it to fsolve 2!")
+    print('------------------------------------')
     return errors
 
 
@@ -702,18 +715,34 @@ def run_SS(p, client=None):
         n_guess = np.ones((p.S, p.J)) * .4 * p.ltilde  ### hard coded
         rguess = 0.09
         T_Hguess = 0.12
-        factorguess = 70000 # convert it to yen
+        factorguess = 7.7 # convert it to yen and account that unit of income in Millions 
         BQguess = aggr.get_BQ(rguess, b_guess, None, p, 'SS', False)
         ss_params_baseline = (b_guess, n_guess, None, None, p, client)
+        print('------------------------------------')
+        print("Made it to -2!")
+        print('------------------------------------')
         if p.use_zeta:
             guesses = [rguess] + list([BQguess]) + [T_Hguess, factorguess]
+            print('------------------------------------')
+            print("Made it to -1!")
+            print('------------------------------------')
         else:
             guesses = [rguess] + list(BQguess) + [T_Hguess, factorguess]
+            print('------------------------------------')
+            print("Made it to 0!")
+            print('------------------------------------')
         [solutions_fsolve, infodict, ier, message] =\
             opt.fsolve(SS_fsolve, guesses, args=ss_params_baseline,
-                       xtol=p.mindist_SS, full_output=True)
+                       xtol=0.1, full_output=True)#xtol=p.mindist_SS, full_output=True)
         if ENFORCE_SOLUTION_CHECKS and not ier == 1:
+            from ogusa import calibrate
+            print('------------------------------------')
+            print('LABOR MODEL MOMENTS', calibrate.calc_moments(output, p.omega_SS, p.lambdas, p.S, p.J))
+            print('------------------------------------')
             raise RuntimeError('Steady state equilibrium not found')
+        print('------------------------------------')
+        print("Made it to 1!")
+        print('------------------------------------')
         rss = solutions_fsolve[0]
         BQss = solutions_fsolve[1:-2]
         T_Hss = solutions_fsolve[-2]
@@ -722,8 +751,14 @@ def run_SS(p, client=None):
         # = True, but that's ok - will be fixed in SS_solver
         fsolve_flag = True
         # Return SS values of variables
+        print('------------------------------------')
+        print("Made it to 2!")
+        print('------------------------------------')
         output = SS_solver(b_guess, n_guess, rss, BQss, T_Hss,
                            factor_ss, Yss, p, client, fsolve_flag)
+        print('------------------------------------')
+        print("Made it to 3!")
+        print('------------------------------------')
     else:
         # Use the baseline solution to get starting values for the reform
         baseline_ss_dir = os.path.join(p.baseline_dir, 'SS/SS_vars.pkl')
@@ -765,6 +800,10 @@ def run_SS(p, client=None):
             # budget_balance = True, but that's ok - will be fixed in
             # SS_solver
         if ENFORCE_SOLUTION_CHECKS and not ier == 1:
+            from ogusa import calibrate
+            print('------------------------------------')
+            print('LABOR MODEL MOMENTS', calibrate.calc_moments(output, p.omega_SS, p.lambdas, p.S, p.J))
+            print('------------------------------------')
             raise RuntimeError('Steady state equilibrium not found')
         # Return SS values of variables
         fsolve_flag = True
@@ -777,5 +816,10 @@ def run_SS(p, client=None):
                           + 'ratio results in an infeasible amount of '
                           + 'government spending in order to close the '
                           + 'budget (i.e., G < 0)')
+    
+    from ogusa import calibrate
+    print('------------------------------------')
+    print('LABOR MODEL MOMENTS', calibrate.calc_moments(output, p.omega_SS, p.lambdas, p.S, p.J))
+    print('------------------------------------')
 
     return output

@@ -11,6 +11,7 @@ This file calls the following files:
 # Packages
 import numpy as np
 from ogusa import tax, utils
+import pandas as pd
 
 '''
 ------------------------------------------------------------------------
@@ -260,7 +261,7 @@ def FOC_savings(r, w, b, b_splus1, n, bq, factor, T_H, theta, e, rho,
         deriv = [S,J] array, after-tax return on capital
         savings_ut = [S,J] array, marginal utility from savings
         euler = [S,J] array, Euler error from FOC for savings
-
+    
     Returns: euler
     '''
     if j is not None:
@@ -271,16 +272,33 @@ def FOC_savings(r, w, b, b_splus1, n, bq, factor, T_H, theta, e, rho,
             r = utils.to_timepath_shape(r, p)
             w = utils.to_timepath_shape(w, p)
             T_H = utils.to_timepath_shape(T_H, p)
+    
+    
+    b_splus1 = pd.DataFrame(b_splus1)
+    b_splus1[b_splus1 <= 0] = 1e-5
+    b_splus1 = np.array(b_splus1).squeeze()
 
     taxes = tax.total_taxes(r, w, b, n, bq, factor, T_H, theta, t, j,
                             False, method, e, etr_params, p)
     cons = get_cons(r, w, b, b_splus1, n, bq, taxes, e, tau_c, p)
     deriv = ((1 + r) - r * (tax.MTR_income(r, w, b, n, factor, True, e,
                                            etr_params, mtry_params, p)))
-    savings_ut = (rho * np.exp(-p.sigma * p.g_y) * chi_b *
-                  b_splus1 ** (-p.sigma))
+    savings_ut = (rho * (b_splus1 * np.exp(p.g_y)) ** (-p.sigma) * chi_b)
+    if pd.DataFrame(savings_ut).isnull().values.any():
+        print("--------------------------------------------")
+        print("Invalid power encountered")
+        print("Sigma: ", p.sigma)
+        print("b_splus1: ", b_splus1)
+        print("exp: ", np.exp(p.g_y))
+        print("--------------------------------------------")
     euler_error = np.zeros_like(n)
     if n.shape[0] > 1:
+        #print("Savings shape: ", savings_ut[:-1].shape)
+        #print("Cons shape: ", cons[1:].shape)
+        #print("g_y shape: ", p.g_y.shape)
+        #print("tau shape: ", tau_c[1:].shape)
+        #print("rho shape: ", rho[:-1].shape)
+        #print("deriv shape: ", deriv[1:].shape)
         euler_error[:-1] = (marg_ut_cons(cons[:-1], p.sigma) *
                             (1 / (1 + tau_c[:-1])) - p.beta *
                             (1 - rho[:-1]) * deriv[1:] *
