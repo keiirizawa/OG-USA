@@ -337,9 +337,6 @@ def SS_solver(bmat, nmat, r, BQ, T_H, factor, Y, p, client,
     --------------------------------------------------------------------
     '''
     # Rename the inputs
-    Lss = aggr.get_L(nssmat, p, 'SS')
-    print(Lss)
-    stop
 
     if not p.budget_balance:
         if not p.baseline_spending:
@@ -627,6 +624,11 @@ def SS_fsolve(guesses, *args):
     print('------------------------------------')
     print("Made it to fsolve 1!")
     print('------------------------------------')
+    #Lss = aggr.get_L(nssmat, p, 'SS')
+    nssmat = {'nssmat': nssmat}
+    from ogusa import calibrate
+    nssmat = calibrate.calc_moments(nssmat, p.omega_SS, p.lambdas, p.S, p.J)
+    print(nssmat)
 
     # Create list of errors in general equilibrium variables
     error1 = new_r - r
