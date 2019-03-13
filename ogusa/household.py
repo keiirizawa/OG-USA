@@ -274,9 +274,9 @@ def FOC_savings(r, w, b, b_splus1, n, bq, factor, T_H, theta, e, rho,
             T_H = utils.to_timepath_shape(T_H, p)
     
     
-    b_splus1 = pd.DataFrame(b_splus1)
-    b_splus1[b_splus1 <= 0] = 1e-5
-    b_splus1 = np.array(b_splus1).squeeze()
+    # b_splus1 = pd.DataFrame(b_splus1)
+    # b_splus1[b_splus1 <= 0] = 1e-5
+    # b_splus1 = np.array(b_splus1).squeeze()
 
     taxes = tax.total_taxes(r, w, b, n, bq, factor, T_H, theta, t, j,
                             False, method, e, etr_params, p)
