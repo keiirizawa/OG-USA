@@ -715,7 +715,7 @@ def run_SS(p, client=None):
     if p.baseline:
         b_guess = np.ones((p.S, p.J)) * 0.07   ### hard coded
         n_guess = np.ones((p.S, p.J)) * .4 * p.ltilde  ### hard coded
-        rguess = 0.09
+        rguess = 0.01 # initially 0.09
         T_Hguess = 0.12
         factorguess = 7.7 # convert it to yen and account that unit of income in Millions 
         BQguess = aggr.get_BQ(rguess, b_guess, None, p, 'SS', False)
