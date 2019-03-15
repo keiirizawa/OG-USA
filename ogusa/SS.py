@@ -522,8 +522,26 @@ def SS_solver(bmat, nmat, r, BQ, T_H, factor, Y, p, client,
                                     p.mindist_SS):
         print('Resource Constraint Difference:', resource_constraint)
         err = 'Steady state aggregate resource constraint not satisfied'
-        raise RuntimeError(err)
+        # raise RuntimeError(err)
+        print(err)
+        euler_savings = euler_errors[:p.S, :]
+        euler_labor_leisure = euler_errors[p.S:, :]
+        output = {'Kss': Kss, 'Bss': Bss, 'Lss': Lss, 'Css': Css, 'Iss': Iss,
+              'Iss_total': Iss_total, 'nssmat': nssmat, 'Yss': Yss,
+              'Dss': debt_ss, 'wss': wss, 'rss': rss, 'theta': theta,
+              'BQss': BQss, 'factor_ss': factor_ss, 'bssmat_s': bssmat_s,
+              'cssmat': cssmat, 'bssmat_splus1': bssmat_splus1,
+              'bqssmat': bqssmat, 'T_Hss': T_Hss, 'Gss': Gss,
+              'total_revenue_ss': total_revenue_ss,
+              'business_revenue': business_revenue,
+              'IITpayroll_revenue': T_Iss,
+              'T_Pss': T_Pss, 'T_BQss': T_BQss, 'T_Wss': T_Wss,
+              'T_Css': T_Css, 'euler_savings': euler_savings,
+              'euler_labor_leisure': euler_labor_leisure,
+              'resource_constraint_error': resource_constraint,
+              'etr_ss': etr_ss, 'mtrx_ss': mtrx_ss, 'mtry_ss': mtry_ss}
 
+        return output
     # check constraints
     household.constraint_checker_SS(bssmat_splus1, nssmat, cssmat, p.ltilde)
 
@@ -715,7 +733,7 @@ def run_SS(p, client=None):
     if p.baseline:
         b_guess = np.ones((p.S, p.J)) * 0.07   ### hard coded
         n_guess = np.ones((p.S, p.J)) * .4 * p.ltilde  ### hard coded
-        rguess = 0.01 # initially 0.09
+        rguess = 0.09 # initially 0.09
         T_Hguess = 0.12
         factorguess = 7.7 # convert it to yen and account that unit of income in Millions 
         BQguess = aggr.get_BQ(rguess, b_guess, None, p, 'SS', False)
@@ -741,7 +759,8 @@ def run_SS(p, client=None):
             print('------------------------------------')
             print('LABOR MODEL MOMENTS', calibrate.calc_moments(output, p.omega_SS, p.lambdas, p.S, p.J))
             print('------------------------------------')
-            raise RuntimeError('Steady state equilibrium not found')
+            #raise RuntimeError('Steady state equilibrium not found')
+            print('Steady state equilibrium not found')
         print('------------------------------------')
         print("Made it to 1!")
         print('------------------------------------')
@@ -806,7 +825,9 @@ def run_SS(p, client=None):
             print('------------------------------------')
             print('LABOR MODEL MOMENTS', calibrate.calc_moments(output, p.omega_SS, p.lambdas, p.S, p.J))
             print('------------------------------------')
-            raise RuntimeError('Steady state equilibrium not found')
+            #raise RuntimeError('Steady state equilibrium not found')  # want to save these variables so commented out !!!!
+            print('Steady state equilibrium not found')
+
         # Return SS values of variables
         fsolve_flag = True
         # Return SS values of variables
