@@ -133,15 +133,15 @@ def chi_estimate(p, client=None):
     # a4 = 1.85173227e-06
 
 
-    sixty_plus_chi = 300
+    # sixty_plus_chi = 300
     params_init = np.array([a0, a1, a2, a3, a4])
 
     # Generate labor data moments
-    labor_hours = np.array([167, 165, 165, 165, 165, 166, 165, 165, 164, 166, 164])
+    labor_hours = np.array([167, 165, 165, 165, 165, 166, 165, 165, 164])#, 166, 164])
 
-    labor_part_rate = np.array([0.69, 0.849, 0.849, 0.847, 0.847, 0.859, 0.859, 0.709, 0.709, 0.212, 0.212])
+    labor_part_rate = np.array([0.69, 0.849, 0.849, 0.847, 0.847, 0.859, 0.859, 0.709, 0.709])#, 0.212, 0.212])
 
-    employ_rate = np.array([0.937, 0.954, 0.954, 0.966, 0.966, 0.97, 0.97, 0.968, 0.968, 0.978, 0.978])
+    employ_rate = np.array([0.937, 0.954, 0.954, 0.966, 0.966, 0.97, 0.97, 0.968, 0.968])#, 0.978, 0.978])
 
     labor_hours_adj = labor_hours * labor_part_rate * employ_rate
 
@@ -157,21 +157,27 @@ def chi_estimate(p, client=None):
 
     # weighting matrix
     W = np.identity(p.J+2+p.S)
-    W = np.identity(11)
+    W = np.identity(9)
 
     ages = np.linspace(20, 65, p.S // 2 + 5)
     #ages = np.linspace(20, 100, p.S)
 
     est_output = opt.minimize(minstat, params_init,\
-                args=(p, client, data_moments, W, ages, sixty_plus_chi),\
+                args=(p, client, data_moments, W, ages),\
                 method="L-BFGS-B",\
                 tol=1e-15, options={'eps': 1e-10})
     a0, a1, a2, a3, a4 = est_output.x
     #chi_n = chebyshev_func(ages, a0, a1, a2, a3, a4)
     chi_n = np.ones(p.S)
+    #ages_full = np.linspace(20, 100, p.S)
+    #chi_n = chebyshev_func(ages_full, a0, a1, a2, a3, a4)
+    
     chi_n[:p.S // 2 + 5] = chebyshev_func(ages, a0, a1, a2, a3, a4)
-    chi_n[p.S // 2 + 5:] = sixty_plus_chi
+    slope = 1500#chi_n[p.S // 2 + 5 - 1] - chi_n[p.S // 2 + 5 - 2]
+    chi_n[p.S // 2 + 5 - 1:] = (np.linspace(65, 100, 36) - 65) * slope + chi_n[p.S // 2 + 5 - 1]
+    chi_n[chi_n < 0.5] = 0.5
     p.chi_n = chi_n
+    print('PARAMS for Chebyshev:', est_output.x)
     pickle.dump(chi_n, open("chi_n.p", "wb"))
 
     ss_output = SS.run_SS(p)
@@ -202,14 +208,21 @@ def minstat(params, *args):
     '''
 
     a0, a1, a2, a3, a4 = params
-    p, client, data_moments, W, ages, sixty_plus_chi = args
+    p, client, data_moments, W, ages = args
     chi_n = np.ones(p.S)
     #chi_n = chebyshev_func(ages, a0, a1, a2, a3, a4)
     chi_n[:p.S // 2 + 5] = chebyshev_func(ages, a0, a1, a2, a3, a4)
-    chi_n[p.S // 2 + 5:] = sixty_plus_chi
+    #chi_n[p.S // 2 + 5:] = sixty_plus_chi
+    slope = chi_n[p.S // 2 + 5 - 1] - chi_n[p.S // 2 + 5 - 2]
+    chi_n[p.S // 2 + 5 - 1:] = (np.linspace(65, 100, 36) - 65) * slope + chi_n[p.S // 2 + 5 - 1]
+    chi_n[chi_n < 0.5] = 0.5
 
     p.chi_n = chi_n
     #print(chi_n)
+
+    print("-----------------------------------------------------")
+    print('PARAMS', params)
+    print("-----------------------------------------------------")
 
     try:
        ss_output = SS.run_SS(p, client)
@@ -227,8 +240,8 @@ def minstat(params, *args):
     print("-----------------------------------------------------")
 
     # distance with levels
-    distance = np.dot(np.dot((np.array(model_moments) - np.array(data_moments)).T,W),
-                   np.array(model_moments) - np.array(data_moments))
+    distance = np.dot(np.dot((np.array(model_moments[:9]) - np.array(data_moments)).T,W),
+                   np.array(model_moments[:9]) - np.array(data_moments))
     #distance = ((np.array(model_moments) - np.array(data_moments))**2).sum()
     print('DATA and MODEL DISTANCE: ', distance)
 
@@ -284,6 +297,10 @@ def calc_moments(ss_output, omega_SS, lambdas, S, J):
     model_labor_moments['age_bins'] = pd.cut(ages, age_bins, right=False, include_lowest=True, labels=labels)
     weighted_labor_moments = model_labor_moments.groupby('age_bins')['labor_weighted'].sum() /\
                                 model_labor_moments.groupby('age_bins')['pop_dist'].sum()
+
+
+    # For visualization purpose:
+
 
 
     # combine moments

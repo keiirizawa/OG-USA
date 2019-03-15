@@ -195,6 +195,21 @@ def get_cons(r, w, b, b_splus1, n, bq, net_tax, e, tau_c, p):
             net_tax) / (1 + tau_c)
     return cons
 
+def get_marg_sav(b_splus1, chi_b, rho, epsilon, p):
+        '''
+        Assuming chi_b is a scalar
+        '''
+        b_df = pd.DataFrame(b_splus1)
+        rho_df = pd.DataFrame(np.array(rho))
+        savings_ut = pd.DataFrame(np.ones(b_splus1.shape))
+        savings_ut[b_df >= epsilon] =\
+            rho_df[b_df >= epsilon] * (b_df[b_df >= epsilon] * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
+        y1 = rho_df[b_df < epsilon] * (1 * epsilon * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
+        y2 = rho_df[b_df < epsilon] * (2 * epsilon * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
+        slope = (y2 - y1) / (2 * epsilon)
+        savings_ut[b_df < epsilon] =\
+            slope * (b_df[b_df < epsilon] - epsilon) + y1
+        return np.array(savings_ut).squeeze()
 
 def FOC_savings(r, w, b, b_splus1, n, bq, factor, T_H, theta, e, rho,
                 tau_c, etr_params, mtry_params, t, j, p, method):
@@ -266,13 +281,13 @@ def FOC_savings(r, w, b, b_splus1, n, bq, factor, T_H, theta, e, rho,
     '''
     if j is not None:
         chi_b = p.chi_b[j]
+        
     else:
         chi_b = p.chi_b
         if method == 'TPI':
             r = utils.to_timepath_shape(r, p)
             w = utils.to_timepath_shape(w, p)
             T_H = utils.to_timepath_shape(T_H, p)
-    
     
     # b_splus1 = pd.DataFrame(b_splus1)
     # b_splus1[b_splus1 <= 0] = 1e-5
@@ -283,7 +298,9 @@ def FOC_savings(r, w, b, b_splus1, n, bq, factor, T_H, theta, e, rho,
     cons = get_cons(r, w, b, b_splus1, n, bq, taxes, e, tau_c, p)
     deriv = ((1 + r) - r * (tax.MTR_income(r, w, b, n, factor, True, e,
                                            etr_params, mtry_params, p)))
-    savings_ut = (rho * (b_splus1 * np.exp(p.g_y)) ** (-p.sigma) * chi_b)
+        
+    savings_ut = get_marg_sav(b_splus1, chi_b, rho, 1e-7, p)
+    #savings_ut = (rho * (b_splus1 * np.exp(p.g_y)) ** (-p.sigma) * chi_b)
     if pd.DataFrame(savings_ut).isnull().values.any():
         print("--------------------------------------------")
         print("Invalid power encountered")
