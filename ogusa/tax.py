@@ -169,9 +169,10 @@ def ETR_income(r, w, b, n, factor, e, etr_params, p):
         # phi0 = np.squeeze(etr_params[..., 0])
         # phi1 = np.squeeze(etr_params[..., 1])
         # phi2 = np.squeeze(etr_params[..., 2])
-        phi0 = 0.37247346
-        phi1 = 0.01977261
-        phi2 = 1.71646644
+        phi0 = 5.66885717e+01
+        phi1 = 8.89727694e-04
+        phi2 = 3.96781859e-01
+
         tau = phi0 - phi0 * (phi1 * I ** phi2 + 1)**(-1 / phi2)
         #tau = (phi0 * (I - ((I ** -phi1) + phi2) ** (-1 / phi1))) / I
     elif p.tax_func_type == 'DEP_totalinc':
@@ -273,9 +274,9 @@ def MTR_income(r, w, b, n, factor, mtr_capital, e, etr_params,
             # phi0 = np.squeeze(etr_params[..., 0])
             # phi1 = np.squeeze(etr_params[..., 1])
             # phi2 = np.squeeze(etr_params[..., 2])
-            phi0 = 0.37247346
-            phi1 = 0.01977261
-            phi2 = 1.71646644
+            phi0 = 5.66885717e+01
+            phi1 = 8.89727694e-04
+            phi2 = 3.96781859e-01
         else:
             phi0 = np.squeeze(mtr_params[..., 0])
             phi1 = np.squeeze(mtr_params[..., 1])

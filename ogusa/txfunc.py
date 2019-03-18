@@ -314,9 +314,9 @@ def get_tax_rates(params, X, Y, wgts, tax_func_type, rate_type,
     I = X + Y
     if tax_func_type == 'GS':
         #phi0, phi1, phi2 = params[:3]
-        phi0 = 0.37247346
-        phi1 = 0.01977261
-        phi2 = 1.71646644
+        phi0 = 5.66885717e+01
+        phi1 = 8.89727694e-04
+        phi2 = 3.96781859e-01
 
         if rate_type == 'etr':
             txrates = phi0 - phi0 * (phi1 * I ** phi2 + 1)**(-1 / phi2)

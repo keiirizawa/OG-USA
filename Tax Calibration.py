@@ -14,9 +14,10 @@ from mpl_toolkits.mplot3d import Axes3D
 #Source: https://www.jetro.go.jp/en/invest/setting_up/section3/page7.html
 def calc_income_tax(income_x, income_y, year):
     total_income = income_x + income_y
+    local_inhab_tax = 0.1 * total_income
     deducted_x = income_x - find_tax_deduction(income_x, year)
-    taxable_income = deducted_x + income_y
-    tax_cost = find_tax_cost(taxable_income)
+    taxable_income = max(deducted_x, 0) + income_y
+    tax_cost = (find_tax_cost(taxable_income)) + local_inhab_tax # + min(deducted_x, 0)
     effective_tax_rate = tax_cost / total_income
     if 2013 <= year <= 2037:
         #Withholding Tax
@@ -80,6 +81,12 @@ plt.ylabel("Effect tax rate")
 plt.title("ETR Over Income")
 plt.show()
 
+
+incomes = np.array([[100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700 , 1800, 1900, 2000]])
+incomes = incomes * 10000
+effective_tax = np.array([0.156, 0.164, 0.172, 0.21, 0.238, 0.258, 0.272, 0.286, 0.297, 0.316, 0.331, 0.344, 0.355, 0.364, 0.373, 0.38, 0.386, 0.392, 0.40, 0.48])
+
+
 #%%
 ### GS Tax Function
 # URL: https://www.jstor.org/stable/pdf/41789070.pdf
@@ -93,10 +100,11 @@ def model_moments(I_array, phi0, phi1, phi2):
     return tax_func(I_array, phi0, phi1, phi2)
 
 def data_moments(I_array):
-    dms = []
-    for i in I_array:
-        dms.append(calc_income_tax(i, 0, 2018))
-    return np.array(dms)
+    # dms = []
+    # for i in I_array:
+    #     dms.append(calc_income_tax(i, 0, 2018))
+    # return np.array(dms)
+    return effective_tax
 
 def err_vec(I_array, I_array_2, phi0, phi1, phi2, simple):
     
@@ -131,9 +139,13 @@ params_init = np.array([phi0, phi1, phi2])
 W_hat = np.eye(10)
 
 # Arguments
-I_array = np.linspace(1, 40000000, 10)
-I_array_2 = I_array * 10 ** (-6)
-gmm_args = (I_array, I_array_2, W_hat)
+# I_array = np.linspace(1, 40000000, 10)
+# I_array_2 = I_array * 10 ** (-6)
+
+incomes = np.array([[100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700 , 1800, 1900, 2000]])
+incomes = incomes * 10000
+#gmm_args = (I_array, I_array_2, W_hat)
+gmm_args = (incomes, W_hat)
 
 # Optimization
 results_GMM = opt.minimize(criterion, params_init, args = (gmm_args), method = 'L-BFGS-B')
