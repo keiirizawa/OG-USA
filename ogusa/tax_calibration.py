@@ -72,12 +72,14 @@ def find_tax_deduction(income, year):
 #%%
 # Graph of Effective Tax Rates
 calc_income_tax(5000000, 0, 2015)
-incomes = np.linspace(1, 40000000, 10)
+incomes = np.linspace(1, 40000000, 1000)
 vals = pd.Series(incomes).apply(calc_income_tax, args=[0, 2015])
 plt.plot(incomes, vals)
-plt.xlabel("Income")
-plt.ylabel("Effect tax rate")
-plt.title("ETR Over Income")
+plt.xlabel(r"Income (yen)")
+plt.ylabel(r"Effective tax rate $\tau_{s,t}^{ETR}$")
+plt.grid(b=True, which='major', color='0.65', linestyle='-')
+plt.tight_layout(rect=(0, 0.03, 1, 1))
+plt.savefig("effective_tax.png")
 plt.show()
 
 #%%
@@ -139,14 +141,13 @@ phi0_GMM, phi1_GMM, phi2_GMM = results_GMM.x
 
 #%%
 # Plot of GS Tax Function 
-I = np.linspace(1,40,100)
+I = np.linspace(1,40,1000)
 
 tax_rate = gs_func(I, phi0_GMM, phi1_GMM, phi2_GMM)
-plt.xlabel('Income (Million of Yen)')
+plt.xlabel('Income (Millions of Yen)')
 plt.ylim(0, 0.4)
-plt.ylabel('Tax Rate')
-plt.title('Income vs Tax Rate (GS)')
-plt.plot(I, tax_rate, color = 'r', label = r'Estimated Tax Rates')
+plt.ylabel('Effecitve Tax Rate $\tau_{s,t}^{ETR}$')
+plt.plot(I, tax_rate, color = 'r', label = r'Estimated')
 plt.legend(loc='upper right')
 
 I_new = I * 10 ** 6
@@ -154,12 +155,16 @@ tax_rate_data = []
 for i in I_new:
     tax_rate_data.append(calc_income_tax(i, 0, 2018))
 tax_rate_data = np.array(tax_rate_data)
-plt.plot(I, tax_rate_data, label = r'Calculated Tax Rates')
+plt.plot(I, tax_rate_data, label = r'Calculated')
 plt.legend(loc='upper right')
+plt.grid(b=True, which='major', color='0.65', linestyle='-')
+plt.tight_layout(rect=(0, 0.03, 1, 1))
+plt.savefig("effective_tax_gs.png")
 
-plt.hlines(y=0.273, xmin=1, xmax=40, label = r'Literature Tax Rate')
-plt.legend(loc='upper right')
 
-plt.savefig("tax_robustness")
-plt.show()
+# plt.hlines(y=0.273, xmin=1, xmax=40, label = r'Literature Tax Rate')
+# plt.legend(loc='upper right')
+
+# plt.savefig("tax_robustness")
+# plt.show()
 
