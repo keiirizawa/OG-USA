@@ -30,10 +30,11 @@ data = np.linspace(20, 100, 81)
 ages = np.linspace(20, 100, 81)
 data[:46] = data_beg
 data[45:] = data_end
-plt.xlabel('Age')
-plt.ylabel(r'$\chi_n$')
-plt.title(r'$\chi_n$ Calibration')
+plt.xlabel('Age $s$')
+plt.ylabel(r'$\chi_n^s$')
 plt.plot(ages, data, color = 'r', label = r'Estimated')
+plt.grid(b=True, which='major', color='0.65', linestyle='-')
+plt.tight_layout(rect=(0, 0.03, 1, 1))
 plt.savefig("chi_n.png")
 
 
@@ -54,12 +55,13 @@ model_moments = np.array([0.21092244724143888, 0.23663473960483364, 0.2512248460
 labels = np.linspace(20, 70, 11)
 labels[-1] = 85
 
-plt.xlabel('Age')
-plt.ylabel('Labor Supply as Percent of Total Time Endowment')
-plt.title('Labor Suppy vs. Age')
+plt.xlabel(r'Age $s$')
+plt.ylabel(r'Labor Supply $\frac{\bar{n_s}}{\tilde{l}}$')
 plt.scatter(labels, data_moments, color = 'r', label = r'Data Moments')
 plt.legend(loc='upper right')
 plt.scatter(labels, model_moments, color = 'b', label = r'Model Moments')
 plt.legend(loc='upper right')
+plt.grid(b=True, which='major', color='0.65', linestyle='-')
+plt.tight_layout(rect=(0, 0.03, 1, 1))
 plt.savefig("labor_moments.png")
 
