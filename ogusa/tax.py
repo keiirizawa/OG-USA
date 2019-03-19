@@ -174,6 +174,17 @@ def ETR_income(r, w, b, n, factor, e, etr_params, p):
         phi2 = 3.96781859e-01
 
         tau = phi0 - phi0 * (phi1 * I ** phi2 + 1)**(-1 / phi2)
+        # if np.isnan(tau).any():
+        #     print('-------------------------------------')
+        #     print('Location 1:')
+        #     print('r:')
+        #     print(r)
+        #     print('-------------------------------------')
+        #     print('b:')
+        #     print(b)
+        #     print('-------------------------------------')
+        #     #print('phi1*I**phi2: ', phi1 * I ** phi2)
+        #     print('-------------------------------------')
         #tau = (phi0 * (I - ((I ** -phi1) + phi2) ** (-1 / phi1))) / I
     elif p.tax_func_type == 'DEP_totalinc':
         A = np.squeeze(etr_params[..., 0])
@@ -282,7 +293,18 @@ def MTR_income(r, w, b, n, factor, mtr_capital, e, etr_params,
             phi1 = np.squeeze(mtr_params[..., 1])
             phi2 = np.squeeze(mtr_params[..., 2])
         tau = (phi0*(1 - (I ** (-phi1 - 1) * ((I ** -phi1) + phi2)
-                          ** ((-1 - phi1) / phi1))))
+                        ** ((-1 - phi1) / phi1))))
+        # if np.isnan(tau).any():
+        #     print('-------------------------------------')
+        #     print('Location 2:')
+        #     print('r:')
+        #     print(r)
+        #     print('-------------------------------------')
+        #     print('b:')
+        #     print(b)
+        #     print('-------------------------------------')
+        #     #print('phi1*I**phi2: ', phi1 * I ** phi2)
+        #     print('-------------------------------------')
     elif p.tax_func_type == 'DEP_totalinc':
         if p.analytical_mtrs:
             A = np.squeeze(etr_params[..., 0])

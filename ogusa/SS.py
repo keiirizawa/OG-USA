@@ -222,11 +222,15 @@ def inner_loop(outer_loop_vars, p, client):
         B = aggr.get_K(bssmat, p, 'SS', False)
         if p.budget_balance:
             K = B
+            print('1st statement being used')
         else:
             K = B - p.debt_ratio_ss * Y
+            print('2nd statement being used')
     else:
         K = firm.get_K(L, r, p, 'SS')
+        print('3rd statement being used')
     new_Y = firm.get_Y(K, L, p, 'SS')
+    print('NEW Y IS BEING USED')
     if p.budget_balance:
         Y = new_Y
     if not p.small_open:
@@ -441,6 +445,7 @@ def SS_solver(bmat, nmat, r, BQ, T_H, factor, Y, p, client,
             debt_ss = p.debt_ratio_ss * Y
 
     Yss = firm.get_Y(Kss, Lss, p, 'SS')
+    print('YSS IS BEING USED')
     theta = tax.replacement_rate_vals(nssmat, wss, factor_ss, None, p)
 
     # Compute effective and marginal tax rates for all agents
