@@ -907,7 +907,7 @@ def txfunc_est(df, s, t, rate_type, tax_func_type, numparams,
         params = np.zeros(numparams)
         ### Plug in our estimates of phi0, phi1, phi2 based on the function. !!!!!
         # params[:3] = np.array([phi0til, phi1til, phi2til])
-        params[:3] = np.array([0.37247346, 0.01977261, 1.71646644])
+        params[:3] = np.array([5.66885717e+01, 8.89727694e-04, 3.96781859e-01])
         params_to_plot = params
 
     elif tax_func_type == "linear":

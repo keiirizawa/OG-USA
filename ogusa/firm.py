@@ -53,6 +53,10 @@ def get_Y(K, L, p, method):
         Z = p.Z[:p.T]
     if p.epsilon == 1:
         # Unit elasticity, Cobb-Douglas
+        print('Z: ', Z)
+        print('K: ', K)
+        print('L: ', L)
+        print('p.gamma: ', p.gamma)
         Y = Z * (K ** p.gamma) * (L ** (1 - p.gamma))
     else:
         # General case

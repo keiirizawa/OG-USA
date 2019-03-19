@@ -200,7 +200,14 @@ def get_marg_sav(b_splus1, chi_b, rho, epsilon, p):
         Assuming chi_b is a scalar
         '''
         b_df = pd.DataFrame(b_splus1)
-        rho_df = pd.DataFrame(np.array(rho))
+        try:
+            rho_df = pd.DataFrame(np.array(rho))
+        except:
+            print('------------------------')
+            print('Rho:')
+            print(rho)
+            print('------------------------')
+            rho_df = pd.DataFrame(np.array([rho]))
         savings_ut = pd.DataFrame(np.ones(b_splus1.shape))
         savings_ut[b_df >= epsilon] =\
             rho_df[b_df >= epsilon] * (b_df[b_df >= epsilon] * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
