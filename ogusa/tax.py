@@ -178,21 +178,34 @@ def ETR_income(r, w, b, n, factor, e, etr_params, p):
         if np.isnan(tau).any() or np.isinf(tau).any():
             print('-------------------------------------')
             print('Location 1:')
-            print('w:')
-            print(w)
+            if (X < 0).any():
+                print('X has negative values')
+            if (Y < 0).any():
+                print('Y has negative values')
+            if (w < 0).any():
+                print('w has negative values')
+            if (e < 0).any():
+                print('e has negative values')
+            if (n < 0).any():
+                print('n has negative values')
+            if (factor < 0).any():
+                print('factor has negative values')
             print('-------------------------------------')
-            print('e:')
-            print(e)
-            print('-------------------------------------')
-            print('n:')
-            print(n)
-            print('-------------------------------------')
-            print('r:')
-            print(r)
-            print('-------------------------------------')
-            print('b:')
-            print(b)
-            print('-------------------------------------')
+            # print('w:')
+            # print(w)
+            # print('-------------------------------------')
+            # print('e:')
+            # print(e)
+            # print('-------------------------------------')
+            # print('n:')
+            # print(n)
+            # print('-------------------------------------')
+            # print('r:')
+            # print(r)
+            # print('-------------------------------------')
+            # print('b:')
+            # print(b)
+            # print('-------------------------------------')
         #tau = (phi0 * (I - ((I ** -phi1) + phi2) ** (-1 / phi1))) / I
     elif p.tax_func_type == 'DEP_totalinc':
         A = np.squeeze(etr_params[..., 0])
@@ -310,23 +323,36 @@ def MTR_income(r, w, b, n, factor, mtr_capital, e, etr_params,
         if np.isnan(tau).any() or np.isinf(tau).any():
             print('-------------------------------------')
             print('Location 2:')
-            print('w:')
-            print(w)
+            if (X < 0).any():
+                print('X has negative values')
+            if (Y < 0).any():
+                print('Y has negative values')
+            if (w < 0).any():
+                print('w has negative values')
+            if (e < 0).any():
+                print('e has negative values')
+            if (n < 0).any():
+                print('n has negative values')
+            if (factor < 0).any():
+                print('factor has negative values')
             print('-------------------------------------')
-            print('e:')
-            print(e)
-            print('-------------------------------------')
-            print('n:')
-            print(n)
-            print('-------------------------------------')
-            print('r:')
-            print(r)
-            print('-------------------------------------')
-            print('b:')
-            print(b)
-            print('-------------------------------------')
-            #print('phi1*I**phi2: ', phi1 * I ** phi2)
-            print('-------------------------------------')
+            # print('w:')
+            # print(w)
+            # print('-------------------------------------')
+            # print('e:')
+            # print(e)
+            # print('-------------------------------------')
+            # print('n:')
+            # print(n)
+            # print('-------------------------------------')
+            # print('r:')
+            # print(r)
+            # print('-------------------------------------')
+            # print('b:')
+            # print(b)
+            # print('-------------------------------------')
+            # #print('phi1*I**phi2: ', phi1 * I ** phi2)
+            # print('-------------------------------------')
     elif p.tax_func_type == 'DEP_totalinc':
         if p.analytical_mtrs:
             A = np.squeeze(etr_params[..., 0])

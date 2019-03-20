@@ -22,6 +22,7 @@ This py-file creates the following other file(s):
 
 # Packages
 import numpy as np
+import pandas as pd
 import pickle
 import scipy.optimize as opt
 from dask.distributed import Client
@@ -159,8 +160,14 @@ def firstdoughnutring(guesses, r, w, bq, T_H, theta, factor, j,
 
     if np.isnan(b_s).any() or (np.array(b_s) < 0).any()\
         or (np.array(n) < 0).any() or np.isnan(n).any()\
-        or np.isnan(r).any() or np.isnan(w).any():
-        return [np.array(1e10)] * 2
+        or np.isnan(r).any() or np.isnan(w).any()\
+        or (w < 0).any():
+        b_s = pd.DataFrame(b_s)
+        n = pd.DataFrame(np.array(n))
+        w = np.array(w)
+        error_sum = b_s[b_s < 0].sum().sum() +\
+            n[n < 0].sum().sum() + w[w < 0].sum().sum()
+        return [np.array(1e9 * error_sum)] * 2
 
     # Find errors from FOC for savings and FOC for labor supply
     error1 = household.FOC_savings(np.array([r]), np.array([w]), b_s,
@@ -232,8 +239,15 @@ def twist_doughnut(guesses, r, w, bq, T_H, theta, factor, j, s, t,
 
     if np.isnan(b_s).any() or (b_s < 0).any()\
         or (n_guess < 0).any() or np.isnan(n_guess).any()\
-        or np.isnan(r_s).any() or np.isnan(w_s).any():
-        return [1e10] * 2 * n_guess.shape[0]
+        or np.isnan(r_s).any() or np.isnan(w_s).any()\
+        or (w_s < 0).any():
+        b_s = pd.DataFrame(b_s)
+        n_guess = pd.DataFrame(n_guess)
+        w_s = np.array(w_s)
+        error_sum = b_s[b_s < 0].sum().sum() +\
+            n_guess[n_guess < 0].sum().sum() +\
+            w_s[w_s < 0].sum().sum()
+        return [1e9 * error_sum] * 2 * n_guess.shape[0]
 
     error1 = household.FOC_savings(r_s, w_s, b_s, b_splus1, n_s, bq,
                                    factor, T_H_s, theta, e_s, rho_s,
