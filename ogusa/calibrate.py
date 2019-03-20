@@ -119,7 +119,7 @@ def chi_estimate(p, client=None):
     a4 = 1.00404321e-05
     """
 
-    a0 = 1.15807470e+03#5.19144310e+02
+    a0 = 1.10807470e+03#5.19144310e+02
     a1 = -1.05805189e+02#-4.70245283e+01
     a2 = 1.92411660e+00#8.55162933e-01
     a3 = -1.53364020e-02#-6.81617866e-03
@@ -175,9 +175,11 @@ def chi_estimate(p, client=None):
     chi_n[:p.S // 2 + 5] = chebyshev_func(ages, a0, a1, a2, a3, a4)
     slope = 1500#chi_n[p.S // 2 + 5 - 1] - chi_n[p.S // 2 + 5 - 2]
     chi_n[p.S // 2 + 5 - 1:] = (np.linspace(65, 100, 36) - 65) * slope + chi_n[p.S // 2 + 5 - 1]
-    chi_n[chi_n < 0.5] = 0.5
+    #chi_n[chi_n < 0.5] = 0.5
     p.chi_n = chi_n
     print('PARAMS for Chebyshev:', est_output.x)
+    with open("output.txt", "a") as text_file:
+        text_file.write('\nPARAMS for Chebyshev: ' + str(est_output.x) + '\n')
     pickle.dump(chi_n, open("chi_n.p", "wb"))
 
     ss_output = SS.run_SS(p)
@@ -215,27 +217,35 @@ def minstat(params, *args):
     #chi_n[p.S // 2 + 5:] = sixty_plus_chi
     slope = chi_n[p.S // 2 + 5 - 1] - chi_n[p.S // 2 + 5 - 2]
     chi_n[p.S // 2 + 5 - 1:] = (np.linspace(65, 100, 36) - 65) * slope + chi_n[p.S // 2 + 5 - 1]
-    chi_n[chi_n < 0.5] = 0.5
+    #chi_n[chi_n < 0.5] = 0.5
 
     p.chi_n = chi_n
     #print(chi_n)
 
+    with open("output.txt", "a") as text_file:
+        text_file.write('\nPARAMS AT START\n' + str(params) + '\n')
     print("-----------------------------------------------------")
-    print('PARAMS', params)
+    print('PARAMS AT START' + str(params))
     print("-----------------------------------------------------")
 
     try:
        ss_output = SS.run_SS(p, client)
     except:
-       print("-----------------------------------------------------")
-       print("Steady state not found")
-       print("-----------------------------------------------------")
-       return 1e100
+        with open("output.txt", "a") as text_file:
+            text_file.write('\nSteady state not found\n' + str(params) + '\n')
+        print("-----------------------------------------------------")
+        print("Steady state not found")
+        print("-----------------------------------------------------")
+        return 1e100
 
+    with open("output.txt", "a") as text_file:
+        text_file.write('\nPARAMS AT END\n' + str(params) + '\n')
     print("-----------------------------------------------------")
-    print('PARAMS', params)
+    print('PARAMS AT END', params)
     print("-----------------------------------------------------")
     model_moments = calc_moments(ss_output, p.omega_SS, p.lambdas, p.S, p.J)
+    with open("output.txt", "a") as text_file:
+        text_file.write('\nModel moments:\n' + str(model_moments) + '\n')
     print('Model moments:', model_moments)
     print("-----------------------------------------------------")
 
@@ -243,6 +253,8 @@ def minstat(params, *args):
     distance = np.dot(np.dot((np.array(model_moments[:9]) - np.array(data_moments)).T,W),
                    np.array(model_moments[:9]) - np.array(data_moments))
     #distance = ((np.array(model_moments) - np.array(data_moments))**2).sum()
+    with open("output.txt", "a") as text_file:
+        text_file.write('\nDATA and MODEL DISTANCE: ' + str(distance) + '\n')
     print('DATA and MODEL DISTANCE: ', distance)
 
     # # distance with percentage diffs
