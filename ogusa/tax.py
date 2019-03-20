@@ -178,6 +178,7 @@ def ETR_income(r, w, b, n, factor, e, etr_params, p):
         if np.isnan(tau).any() or np.isinf(tau).any():
             print('-------------------------------------')
             print('Location 1:')
+<<<<<<< HEAD
             if (X < 0).any():
                 print('X has negative values')
             if (Y < 0).any():
@@ -206,6 +207,23 @@ def ETR_income(r, w, b, n, factor, e, etr_params, p):
             # print('b:')
             # print(b)
             # print('-------------------------------------')
+=======
+            print('w:')
+            print(w)
+            print('-------------------------------------')
+            print('e:')
+            print(e)
+            print('-------------------------------------')
+            print('n:')
+            print(n)
+            print('-------------------------------------')
+            print('r:')
+            print(r)
+            print('-------------------------------------')
+            print('b:')
+            print(b)
+            print('-------------------------------------')
+>>>>>>> e45bda2b32d217b3ef4ed14b3dd87cf484ab68d3
         #tau = (phi0 * (I - ((I ** -phi1) + phi2) ** (-1 / phi1))) / I
     elif p.tax_func_type == 'DEP_totalinc':
         A = np.squeeze(etr_params[..., 0])
@@ -323,6 +341,7 @@ def MTR_income(r, w, b, n, factor, mtr_capital, e, etr_params,
         if np.isnan(tau).any() or np.isinf(tau).any():
             print('-------------------------------------')
             print('Location 2:')
+<<<<<<< HEAD
             if (X < 0).any():
                 print('X has negative values')
             if (Y < 0).any():
@@ -353,6 +372,25 @@ def MTR_income(r, w, b, n, factor, mtr_capital, e, etr_params,
             # print('-------------------------------------')
             # #print('phi1*I**phi2: ', phi1 * I ** phi2)
             # print('-------------------------------------')
+=======
+            print('w:')
+            print(w)
+            print('-------------------------------------')
+            print('e:')
+            print(e)
+            print('-------------------------------------')
+            print('n:')
+            print(n)
+            print('-------------------------------------')
+            print('r:')
+            print(r)
+            print('-------------------------------------')
+            print('b:')
+            print(b)
+            print('-------------------------------------')
+            #print('phi1*I**phi2: ', phi1 * I ** phi2)
+            print('-------------------------------------')
+>>>>>>> e45bda2b32d217b3ef4ed14b3dd87cf484ab68d3
     elif p.tax_func_type == 'DEP_totalinc':
         if p.analytical_mtrs:
             A = np.squeeze(etr_params[..., 0])

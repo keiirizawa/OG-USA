@@ -75,8 +75,13 @@ def fit_ellip_CFE(ellip_init, cfe_params, l_tilde, graph):
 b_ellip = 0.5
 upsilon = 1.5
 ellip_init = np.array([b_ellip, upsilon])
+<<<<<<< HEAD
 cfe_params = 0.9
 l_tilde = 1 #17.5 / 24
+=======
+cfe_params = 0.5
+l_tilde = 17.5 / 24
+>>>>>>> e45bda2b32d217b3ef4ed14b3dd87cf484ab68d3
 fit_ellip_CFE(ellip_init, cfe_params, l_tilde, True)
 
 

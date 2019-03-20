@@ -22,7 +22,10 @@ This py-file creates the following other file(s):
 
 # Packages
 import numpy as np
+<<<<<<< HEAD
 import pandas as pd
+=======
+>>>>>>> e45bda2b32d217b3ef4ed14b3dd87cf484ab68d3
 import pickle
 import scipy.optimize as opt
 from dask.distributed import Client
@@ -125,13 +128,24 @@ def get_initial_SS_values(p):
         D0 = tpi_baseline_vars['D'][0]
     else:
         D0 = 0.0
+<<<<<<< HEAD
+
+    initial_values = (B0, b_sinit, b_splus1init, factor, initial_b,
+                      initial_n, D0)
+=======
 
     initial_values = (B0, b_sinit, b_splus1init, factor, initial_b,
                       initial_n, D0)
 
     return initial_values, SS_values, baseline_values
+>>>>>>> e45bda2b32d217b3ef4ed14b3dd87cf484ab68d3
 
+    return initial_values, SS_values, baseline_values
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> e45bda2b32d217b3ef4ed14b3dd87cf484ab68d3
 def firstdoughnutring(guesses, r, w, bq, T_H, theta, factor, j,
                       initial_b, p):
     '''
@@ -160,6 +174,7 @@ def firstdoughnutring(guesses, r, w, bq, T_H, theta, factor, j,
 
     if np.isnan(b_s).any() or (np.array(b_s) < 0).any()\
         or (np.array(n) < 0).any() or np.isnan(n).any()\
+<<<<<<< HEAD
         or np.isnan(r).any() or np.isnan(w).any()\
         or (w < 0).any():
         b_s = pd.DataFrame(b_s)
@@ -168,6 +183,10 @@ def firstdoughnutring(guesses, r, w, bq, T_H, theta, factor, j,
         error_sum = b_s[b_s < 0].sum().sum() +\
             n[n < 0].sum().sum() + w[w < 0].sum().sum()
         return [np.array(1e9 * error_sum)] * 2
+=======
+        or np.isnan(r).any() or np.isnan(w).any():
+        return [np.array(1e10)] * 2
+>>>>>>> e45bda2b32d217b3ef4ed14b3dd87cf484ab68d3
 
     # Find errors from FOC for savings and FOC for labor supply
     error1 = household.FOC_savings(np.array([r]), np.array([w]), b_s,
@@ -236,6 +255,7 @@ def twist_doughnut(guesses, r, w, bq, T_H, theta, factor, j, s, t,
     e_s = p.e[-length:, j]
     rho_s = p.rho[-length:]
     T_H_s = T_H[t:t + length]
+<<<<<<< HEAD
 
     if np.isnan(b_s).any() or (b_s < 0).any()\
         or (n_guess < 0).any() or np.isnan(n_guess).any()\
@@ -249,16 +269,33 @@ def twist_doughnut(guesses, r, w, bq, T_H, theta, factor, j, s, t,
             w_s[w_s < 0].sum().sum()
         return [1e9 * error_sum] * 2 * n_guess.shape[0]
 
+=======
+
+    if np.isnan(b_s).any() or (b_s < 0).any()\
+        or (n_guess < 0).any() or np.isnan(n_guess).any()\
+        or np.isnan(r_s).any() or np.isnan(w_s).any():
+        return [1e10] * 2 * n_guess.shape[0]
+
+>>>>>>> e45bda2b32d217b3ef4ed14b3dd87cf484ab68d3
     error1 = household.FOC_savings(r_s, w_s, b_s, b_splus1, n_s, bq,
                                    factor, T_H_s, theta, e_s, rho_s,
                                    tau_c, etr_params, mtry_params, t,
                                    j, p, 'TPI')
+<<<<<<< HEAD
 
     error2 = household.FOC_labor(r_s, w_s, b_s, b_splus1, n_s, bq,
                                  factor, T_H_s, theta, chi_n_s, e_s,
                                  tau_c, etr_params, mtrx_params, t, j,
                                  p, 'TPI')
 
+=======
+
+    error2 = household.FOC_labor(r_s, w_s, b_s, b_splus1, n_s, bq,
+                                 factor, T_H_s, theta, chi_n_s, e_s,
+                                 tau_c, etr_params, mtrx_params, t, j,
+                                 p, 'TPI')
+
+>>>>>>> e45bda2b32d217b3ef4ed14b3dd87cf484ab68d3
     # Check and punish constraint violations
     mask1 = n_guess < 0
     error2[mask1] += 1e12

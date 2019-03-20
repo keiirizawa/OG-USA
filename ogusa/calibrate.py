@@ -119,7 +119,12 @@ def chi_estimate(p, client=None):
     a4 = 1.00404321e-05
     """
 
+<<<<<<< HEAD
     a0 = 1.10807470e+03#5.19144310e+02
+=======
+    #a0 = 1.10807470e+03#5.19144310e+02
+    a0 = 1.20807470e+03
+>>>>>>> e45bda2b32d217b3ef4ed14b3dd87cf484ab68d3
     a1 = -1.05805189e+02#-4.70245283e+01
     a2 = 1.92411660e+00#8.55162933e-01
     a3 = -1.53364020e-02#-6.81617866e-03
@@ -175,7 +180,11 @@ def chi_estimate(p, client=None):
     chi_n[:p.S // 2 + 5] = chebyshev_func(ages, a0, a1, a2, a3, a4)
     slope = 1500#chi_n[p.S // 2 + 5 - 1] - chi_n[p.S // 2 + 5 - 2]
     chi_n[p.S // 2 + 5 - 1:] = (np.linspace(65, 100, 36) - 65) * slope + chi_n[p.S // 2 + 5 - 1]
+<<<<<<< HEAD
     chi_n[chi_n < 0.5] = 0.5
+=======
+    #chi_n[chi_n < 0.5] = 0.5
+>>>>>>> e45bda2b32d217b3ef4ed14b3dd87cf484ab68d3
     p.chi_n = chi_n
     print('PARAMS for Chebyshev:', est_output.x)
     with open("output.txt", "a") as text_file:
@@ -217,7 +226,11 @@ def minstat(params, *args):
     #chi_n[p.S // 2 + 5:] = sixty_plus_chi
     slope = chi_n[p.S // 2 + 5 - 1] - chi_n[p.S // 2 + 5 - 2]
     chi_n[p.S // 2 + 5 - 1:] = (np.linspace(65, 100, 36) - 65) * slope + chi_n[p.S // 2 + 5 - 1]
+<<<<<<< HEAD
     chi_n[chi_n < 0.5] = 0.5
+=======
+    #chi_n[chi_n < 0.5] = 0.5
+>>>>>>> e45bda2b32d217b3ef4ed14b3dd87cf484ab68d3
 
     p.chi_n = chi_n
     #print(chi_n)

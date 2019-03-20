@@ -92,9 +92,15 @@ class Specifications(ParametersBase):
         Does cheap calculations to return parameter values
         """
         # get parameters of elliptical utility function
+<<<<<<< HEAD
         #self.b_ellipse = 0.2706558095516009 #0.158272416464032  # calibrated to Japan 
         #self.upsilon = 1.4918235940826008 #1.8566506967986756  # calibrated to Japan
         self.b_ellipse, self.upsilon = elliptical_u_est.estimation(0.5, 0.73)
+=======
+        self.b_ellipse = 0.158272416464032  # calibrated to Japan 
+        self.upsilon = 1.8566506967986756  # calibrated to Japan
+        # self.b_ellipse, self.upsilon = elliptical_u_est.estimation(
+>>>>>>> e45bda2b32d217b3ef4ed14b3dd87cf484ab68d3
         #     self.frisch,
         #     self.ltilde
         # )
@@ -221,6 +227,7 @@ class Specifications(ParametersBase):
             (_, _, self.omega_SS_80, _, _, _, _, _) = \
                 demographics.get_pop_objs(20, 80, 320, 1, 100,
                                           self.start_year, False)
+<<<<<<< HEAD
         
         self.e = pickle.load(open('ability.pkl', 'rb'))
         # self.e = income.get_e_interp(
@@ -228,6 +235,11 @@ class Specifications(ParametersBase):
         #     plot=False)
         
             # change this to e !!!!!
+=======
+        self.e = income.get_e_interp(
+            self.S, self.omega_SS, self.omega_SS_80, self.lambdas,
+            plot=False)
+>>>>>>> e45bda2b32d217b3ef4ed14b3dd87cf484ab68d3
 
     def get_tax_function_parameters(self, client, run_micro=False):
         # Income tax parameters
