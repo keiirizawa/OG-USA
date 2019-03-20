@@ -84,11 +84,15 @@ plt.show()
 
 #%%
 # Calibration to GS Function 
-def gs_func(I, phi0, phi1, phi2):
+def gs_func2(I, phi0, phi1, phi2):
     # URL: https://www.jstor.org/stable/pdf/41789070.pdf
     #txrates = ((phi0 * (I - ((I ** -phi1) + phi2) ** (-1 / phi1))) / I)
     txrates = phi0 - phi0 * (phi1 * I ** phi2 + 1)**(-1 / phi2)
     return txrates
+
+def gs_func(I, phi0, phi1, phi2):
+    tau = (phi0 * (I - ((I ** -phi1) + phi2) ** (-1 / phi1))) 
+    return tau 
 
 def model_moments(I_array, phi0, phi1, phi2):
     return gs_func(I_array, phi0, phi1, phi2)
@@ -168,3 +172,6 @@ plt.savefig("effective_tax_gs.png")
 # plt.savefig("tax_robustness")
 # plt.show()
 
+#%%
+tau = (phi0*(1 - (I ** (-phi1 - 1) * ((I ** -phi1) + phi2)
+                        ** ((-1 - phi1) / phi1))))

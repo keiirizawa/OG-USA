@@ -200,19 +200,19 @@ def get_marg_sav(b_splus1, chi_b, rho, epsilon, p):
         Assuming chi_b is a scalar
         '''
         b_df = pd.DataFrame(b_splus1)
+        savings_ut = pd.DataFrame(np.ones(b_splus1.shape))
         try:
             rho_df = pd.DataFrame(np.array(rho))
-        except:
-            print('------------------------')
-            print('Rho:')
-            print(rho)
-            print('------------------------')
-            rho_df = pd.DataFrame(np.array([rho]))
-        savings_ut = pd.DataFrame(np.ones(b_splus1.shape))
-        savings_ut[b_df >= epsilon] =\
+            savings_ut[b_df >= epsilon] =\
             rho_df[b_df >= epsilon] * (b_df[b_df >= epsilon] * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
-        y1 = rho_df[b_df < epsilon] * (1 * epsilon * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
-        y2 = rho_df[b_df < epsilon] * (2 * epsilon * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
+            y1 = rho_df[b_df < epsilon] * (1 * epsilon * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
+            y2 = rho_df[b_df < epsilon] * (2 * epsilon * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
+        except:
+            savings_ut[b_df >= epsilon] =\
+            rho * (b_df[b_df >= epsilon] * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
+            y1 = rho * (1 * epsilon * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
+            y2 = rho * (2 * epsilon * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
+
         slope = (y2 - y1) / (2 * epsilon)
         savings_ut[b_df < epsilon] =\
             slope * (b_df[b_df < epsilon] - epsilon) + y1
@@ -303,18 +303,24 @@ def FOC_savings(r, w, b, b_splus1, n, bq, factor, T_H, theta, e, rho,
     taxes = tax.total_taxes(r, w, b, n, bq, factor, T_H, theta, t, j,
                             False, method, e, etr_params, p)
     cons = get_cons(r, w, b, b_splus1, n, bq, taxes, e, tau_c, p)
+    #print('MTR CALLED IN HOUSEHOLD 1')
+    if np.isnan(b).any():
+        print('HOUSEHOLD 1 NAN')
     deriv = ((1 + r) - r * (tax.MTR_income(r, w, b, n, factor, True, e,
                                            etr_params, mtry_params, p)))
         
     savings_ut = get_marg_sav(b_splus1, chi_b, rho, 1e-7, p)
     #savings_ut = (rho * (b_splus1 * np.exp(p.g_y)) ** (-p.sigma) * chi_b)
-    if pd.DataFrame(savings_ut).isnull().values.any():
-        print("--------------------------------------------")
-        print("Invalid power encountered")
-        print("Sigma: ", p.sigma)
-        print("b_splus1: ", b_splus1)
-        print("exp: ", np.exp(p.g_y))
-        print("--------------------------------------------")
+    try:
+        if pd.DataFrame(savings_ut).isnull().values.any():
+            print("--------------------------------------------")
+            print("Invalid power encountered")
+            print("Sigma: ", p.sigma)
+            print("b_splus1: ", b_splus1)
+            print("exp: ", np.exp(p.g_y))
+            print("--------------------------------------------")
+    except:
+        pass
     euler_error = np.zeros_like(n)
     if n.shape[0] > 1:
         #print("Savings shape: ", savings_ut[:-1].shape)
@@ -332,9 +338,12 @@ def FOC_savings(r, w, b, b_splus1, n, bq, factor, T_H, theta, e, rho,
         euler_error[-1] = (marg_ut_cons(cons[-1], p.sigma) *
                            (1 / (1 + tau_c[-1])) - savings_ut[-1])
     else:
-        euler_error[-1] = (marg_ut_cons(cons[-1], p.sigma) *
+        try:
+            euler_error[-1] = (marg_ut_cons(cons[-1], p.sigma) *
                            (1 / (1 + tau_c[-1])) - savings_ut[-1])
-
+        except:
+            euler_error[-1] = (marg_ut_cons(cons[-1], p.sigma) *
+                           (1 / (1 + tau_c[-1])) - savings_ut)
     return euler_error
 
 
@@ -439,6 +448,9 @@ def FOC_labor(r, w, b, b_splus1, n, bq, factor, T_H, theta, chi_n, e,
     taxes = tax.total_taxes(r, w, b, n, bq, factor, T_H, theta, t, j,
                             False, method, e, etr_params, p)
     cons = get_cons(r, w, b, b_splus1, n, bq, taxes, e, tau_c, p)
+    #print('MTR CALLED IN HOUSEHOLD 2')
+    if np.isnan(b).any():
+        print('HOUSEHOLD 2 NAN')
     deriv = (1 - tau_payroll - tax.MTR_income(r, w, b, n, factor,
                                               False, e, etr_params,
                                               mtrx_params, p))

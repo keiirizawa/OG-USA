@@ -237,12 +237,12 @@ class Specifications(ParametersBase):
             txfunc.get_tax_func_estimate(
                 self.BW, self.S, self.starting_age, self.ending_age,
                 self.baseline, self.analytical_mtrs,
-                'GS', #self.tax_func_type,
+                self.tax_func_type,
                 self.age_specific, self.start_year, self.reform, self.guid,
                 tx_func_est_path, self.data, client, self.num_workers)
 
         #### We set analytical_mtrs false !!!!!!
-        #### We set tax_func_type to 'GS'
+        #### We set tax_func_type to 'GS' in default parameters.
 
         #####
         if self.baseline:

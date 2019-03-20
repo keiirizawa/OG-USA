@@ -44,7 +44,8 @@ def run_micro_macro(user_params):
                    'alpha_G': alpha_G.tolist(), 'small_open': small_open}
 
                    # debt_ratio_ss: changed to 2
-
+                   # alpha_T: can make this smaller to have transfers lower
+                   # tau_b 55% class c corporates, 21% corporate tax
     '''
     ------------------------------------------------------------------------
     Run baseline policy first
