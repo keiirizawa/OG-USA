@@ -92,10 +92,12 @@ class Specifications(ParametersBase):
         Does cheap calculations to return parameter values
         """
         # get parameters of elliptical utility function
-        self.b_ellipse, self.upsilon = elliptical_u_est.estimation(
-            self.frisch,
-            self.ltilde
-        )
+        self.b_ellipse = 0.158272416464032  # calibrated to Japan 
+        self.upsilon = 1.8566506967986756  # calibrated to Japan
+        # self.b_ellipse, self.upsilon = elliptical_u_est.estimation(
+        #     self.frisch,
+        #     self.ltilde
+        # )
         # determine length of budget window from start year and last
         # year in TC
         self.BW = int(TC_LAST_YEAR - self.start_year + 1)

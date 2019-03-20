@@ -195,23 +195,31 @@ def get_cons(r, w, b, b_splus1, n, bq, net_tax, e, tau_c, p):
             net_tax) / (1 + tau_c)
     return cons
 
-def get_marg_sav(b_splus1, chi_b, rho, epsilon, p):
+def get_marg_sav(b_splus1, chi_b, epsilon, p):
         '''
         Assuming chi_b is a scalar
         '''
         b_df = pd.DataFrame(b_splus1)
         savings_ut = pd.DataFrame(np.ones(b_splus1.shape))
         try:
-            rho_df = pd.DataFrame(np.array(rho))
+            rho_df = pd.DataFrame(np.array(p.rho))
             savings_ut[b_df >= epsilon] =\
             rho_df[b_df >= epsilon] * (b_df[b_df >= epsilon] * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
             y1 = rho_df[b_df < epsilon] * (1 * epsilon * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
             y2 = rho_df[b_df < epsilon] * (2 * epsilon * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
         except:
-            savings_ut[b_df >= epsilon] =\
-            rho * (b_df[b_df >= epsilon] * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
-            y1 = rho * (1 * epsilon * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
-            y2 = rho * (2 * epsilon * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
+            print('---------------------------------')
+            print('RHO:')
+            print(rho)
+            print('---------------------------------')
+            print('---------------------------------')
+            print('P.RHO:')
+            print(p.rho)
+            print('---------------------------------')
+            # savings_ut[b_df >= epsilon] =\
+            # rho * (b_df[b_df >= epsilon] * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
+            # y1 = rho * (1 * epsilon * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
+            # y2 = rho * (2 * epsilon * np.exp(p.g_y)) ** (-p.sigma) * chi_b[0]
 
         slope = (y2 - y1) / (2 * epsilon)
         savings_ut[b_df < epsilon] =\
@@ -309,7 +317,7 @@ def FOC_savings(r, w, b, b_splus1, n, bq, factor, T_H, theta, e, rho,
     deriv = ((1 + r) - r * (tax.MTR_income(r, w, b, n, factor, True, e,
                                            etr_params, mtry_params, p)))
         
-    savings_ut = get_marg_sav(b_splus1, chi_b, rho, 1e-7, p)
+    savings_ut = get_marg_sav(b_splus1, chi_b, 1e-7, p)
     #savings_ut = (rho * (b_splus1 * np.exp(p.g_y)) ** (-p.sigma) * chi_b)
     try:
         if pd.DataFrame(savings_ut).isnull().values.any():
